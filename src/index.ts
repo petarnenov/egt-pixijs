@@ -1,8 +1,11 @@
-import {} from "pixi.js";
+import { Sprite } from "pixi.js";
+import Bunny from "./Bunny";
+import Key from "./Key";
 
 const app = new PIXI.Application({
   backgroundColor: 0xaaaaaa,
   antialias: true,
+  resolution: 1,
 });
 
 document.body.appendChild(app.view);
@@ -99,12 +102,13 @@ PIXI.loader
     const bunny1 = new PIXI.Sprite(
       resources["./assets/tileset.json"].textures["bunny1.png"]
     );
-    //2. from TextureCashe
+    //2. from TextureCache
     const bunny2 = new PIXI.Sprite(PIXI.utils.TextureCache["bunny2.png"]);
 
     //3. from alias
-    const id = PIXI.loader.resources["./assets/tileset.json"].textures;
-    const bunny3 = new PIXI.Sprite(id!["bunny3.png"]);
+    const id = PIXI.loader.resources["./assets/tileset.json"]
+      .textures as PIXI.loaders.TextureDictionary;
+    const bunny3 = new PIXI.Sprite(id["bunny3.png"]);
 
     //add interactivity
     bunny1.interactive = true;
@@ -126,17 +130,26 @@ PIXI.loader
     bunny3.anchor.x = 0.5;
     bunny3.anchor.y = 0.5;
 
-    // Add the bunny1 to the scene we are building
-    app.stage.addChild(bunny3, bunny2, bunny1);
+    //moving
 
-    let delta = -1;
+    const bunny4 = new Bunny(id["bunny3.png"]);
+    bunny4.anchor.set(0.5, 0.5);
+    bunny4.position.set(100, 400);
+
+    // Add the bunny1 to the scene we are building
+    app.stage.addChild(bunny3, bunny2, bunny1, bunny4);
+
+    let delta = 0;
     // Listen for frame updates
 
     bunny2.anchor.set(0, 0.5);
-
+    let offset = 1;
     app.ticker.add(() => {
       // each frame we spin the bunny1 around a bit
       delta += 0.01;
+
+      //2*Math.PI = 360 degree
+      if (delta > 2 * Math.PI) delta = 0;
       Math.sin(delta);
       //bunny1.rotation = delta;
       //bunny1.rotation += delta;
@@ -150,4 +163,101 @@ PIXI.loader
 
       //console.log(delta);
     });
+
+    //add another cb in game-loop
+    app.ticker.add(bunny4Loop);
+
+    //let gravity = 0.1;
+    //add velocity
+    //use velocity to control speed and directions
+
+    //bunny4.vRight = 3;
+    function bunny4Loop() {
+      //if (bunny4.y > 400) bunny4.vUp = -bunny4.vUp;
+      //if (bunny4.y < 200) bunny4.vDown = -bunny4.vDown;
+      //bunny4.y += offset +gravity;
+      //gravity += offset * 0.1;
+      //console.log(bunny4.y)
+      //move up/down by 1px
+      //bunny4.y += offset * 1;
+      bunny4.y += bunny4.vy();
+      //bunny4.vy +=0.3;
+      bunny4.x += bunny4.vx();
+    }
+
+    //Game
+    interface GameState {
+      (delta?: number): void;
+    }
+    const states: GameState[] = [play, stop];
+
+    //add control keys
+    const values = ["Left", "Right", "Up", "Down"];
+    const speed = 5;
+
+    type moveAliases = "left" | "right" | "up" | "down";
+
+    const keys = values.map((value) => new Key(`Arrow${value}`));
+
+    keys.forEach((key, index) => {
+      key.press = () => {
+        //console.log(key.value);
+        bunny4.moves[values[index].toLowerCase() as moveAliases] = speed;
+        //bunny4[] = moves[index][1];
+      };
+      key.release = () => {
+        //console.log(key.value);
+        bunny4.moves[values[index].toLowerCase() as moveAliases] = 0;
+      };
+    });
+
+    // keys[0].press = () => {
+    //   bunny4.vLeft = 5;
+    // };
+    // keys[0].release = () => {
+    //   bunny4.vLeft = 0;
+    // };
+    // keys[1].press = () => {
+    //   bunny4.vRight = 5;
+    // };
+    // keys[1].release = () => {
+    //   bunny4.vRight = 0;
+    // };
+    // keys[2].press = () => {
+    //   bunny4.vUp = 5;
+    // };
+    // keys[2].release = () => {
+    //   bunny4.vUp = 0;
+    // };
+    // keys[3].press = () => {
+    //   bunny4.vDown = 5;
+    // };
+    // keys[3].release = () => {
+    //   bunny4.vDown = 0;
+    // };
+
+    let state = play;
+    let index = 0;
+    setInterval(() => {
+      index ^= 1;
+      state = states[index];
+    }, 3000);
+
+    function play(delta?: number) {
+      //TODO: do here some sprite updates
+      //console.log("play")
+      //console.log(keyA.isDown);
+    }
+
+    function stop(delta?: number) {
+      //TODO: do here some sprite updates
+      //console.log("stop");
+      //console.log(keyA.isDown);
+    }
+
+    function gameLoop(delta: number) {
+      state(delta);
+    }
+
+    app.ticker.add((delta) => gameLoop(delta));
   });
