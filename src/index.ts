@@ -1,6 +1,7 @@
 import { Sprite } from "pixi.js";
 import Bunny from "./Bunny";
 import Key from "./Key";
+import { userInfo } from "os";
 
 const app = new PIXI.Application({
   backgroundColor: 0xaaaaaa,
@@ -260,4 +261,49 @@ PIXI.loader
     }
 
     app.ticker.add((delta) => gameLoop(delta));
+
+    //grouping sprites
+    const groupBunnys: Bunny[] = [];
+
+    let x = 0;
+    let y = 0;
+    for (let i = 1; i <= 25; i++) {
+      const currentBunny = new Bunny(id["bunny3.png"]);
+      currentBunny.x = x * 120;
+      currentBunny.y = y * 120;
+      x++;
+      if (!(i % 5)) {
+        y += 1;
+        x = 0
+      }
+
+      groupBunnys.push(currentBunny);
+    }
+
+    const containerBunnys = new PIXI.Container();
+    containerBunnys.position.set(
+      app.renderer.width / 2,
+      app.renderer.height / 2
+    );
+    groupBunnys.forEach((b) => {
+      containerBunnys.addChild(b);
+    });
+    containerBunnys.pivot = new PIXI.Point(
+      containerBunnys.width / 2,
+      containerBunnys.height / 2
+    );
+    containerBunnys.alpha = 0.8;
+    containerBunnys.scale.set(0.5, 0.5);
+    app.stage.addChild(containerBunnys);
+
+    groupBunnys.forEach(b=>{
+      console.log(b.getGlobalPosition());
+    })
+
+    console.log(groupBunnys[0].toLocal(groupBunnys[0].position,groupBunnys[25]).x);
+    console.log(groupBunnys[0].toLocal(groupBunnys[0].position,groupBunnys[25]).y);
+
+    app.ticker.add(() => {
+      containerBunnys.rotation += 0.01;
+    });
   });

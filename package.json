@@ -12,10 +12,11 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^13.13.2",
+    "@types/pixi.js": "^4.8.8",
+    "parcel": "^1.12.4",
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@types/pixi.js": "^4.8.8",
     "pixi.js": "^4.8.8"
   }
 }
