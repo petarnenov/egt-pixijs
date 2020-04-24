@@ -6,6 +6,7 @@ import {
   TextStyle,
   Text,
   Rectangle,
+  Texture,
 } from "pixi.js";
 import Key from "./Key";
 import Collision from "./Collision";
@@ -24,6 +25,7 @@ document.body.appendChild(app.view);
 
 const gameConfig = {
   state: (delta: number) => {},
+  availableTreasures: 1,
   blobs: [] as Blob[],
   explorer: {} as Explorer,
   explorerSpeed: 3,
@@ -34,10 +36,13 @@ const gameConfig = {
   door: {} as Sprite,
   message: {} as Text,
   keys: [] as Key[],
+  textures: PIXI.utils.TextureCache,
+  levelText: {} as Text,
+  levelCounter: 1,
   playGround: {
     x: 28,
     y: 10,
-    width: 448,
+    width: 480,
     height: 480,
   },
 };
@@ -64,10 +69,7 @@ const gameConfig = {
 
 app.loader.add("./assets/treasureHunter.json").load(setup);
 
-function setup(
-  loader: PIXI.loaders.Loader,
-  resources: PIXI.loaders.ResourceDictionary
-) {
+function setup() {
   //TODO: Initialize the game sprites, set the game "state" to "play"
   //and start the gameLoop
 
@@ -75,19 +77,19 @@ function setup(
   gameConfig.gameScene = new Container();
   app.stage.addChild(gameConfig.gameScene);
 
-  const textures = resources["./assets/treasureHunter.json"].textures;
+  gameConfig.textures = PIXI.utils.TextureCache;
 
   //Create Dungeon
-  const dungeon = new Sprite(textures!["dungeon.png"]);
+  const dungeon = new Sprite(gameConfig.textures!["dungeon.png"]);
   gameConfig.gameScene.addChild(dungeon);
 
   //Create the "door" sprite
-  gameConfig.door = new Sprite(textures!["door.png"]);
+  gameConfig.door = new Sprite(gameConfig.textures!["door.png"]);
   gameConfig.door.position.set(32, 0);
   gameConfig.gameScene.addChild(gameConfig.door);
 
   //Create the "player" sprite
-  gameConfig.explorer = new Explorer(textures!["explorer.png"]);
+  gameConfig.explorer = new Explorer(gameConfig.textures!["explorer.png"]);
   gameConfig.explorer.position.set(
     64,
     gameConfig.gameScene.height / 2 - gameConfig.explorer.height / 2
@@ -95,19 +97,7 @@ function setup(
   gameConfig.gameScene.addChild(gameConfig.explorer);
 
   //Create the "treasure" sprite
-  const treasure = new Sprite(textures!["treasure.png"]);
-  treasure.position.set(
-    RandomRange.getRandomInt(
-      gameConfig.gameScene.width / 2,
-      gameConfig.gameScene.width - treasure.width
-    ),
-    RandomRange.getRandomInt(
-      gameConfig.gameScene.height / 2,
-      gameConfig.gameScene.height - treasure.height
-    )
-  );
-  gameConfig.treasures.push(treasure);
-  gameConfig.gameScene.addChild(...gameConfig.treasures);
+  buildTreasure();
 
   //Make the enemies
   interface BlobConfig {
@@ -118,21 +108,22 @@ function setup(
     direction: number;
   }
   const blobConfig: BlobConfig = {
-    numberOfBlobs: 6,
+    numberOfBlobs: 8,
     spacing: 48,
-    xOffset: 150,
+    xOffset: 96,
     speed: 2,
     direction: 1,
   };
 
   for (let i = 0; i < blobConfig.numberOfBlobs; i++) {
-    const currentBlob = new Blob(textures!["blob.png"]);
+    const currentBlob = new Blob(gameConfig.textures!["blob.png"]);
     let x = blobConfig.spacing * i + blobConfig.xOffset;
     let y = RandomRange.getRandomInt(
       32,
       gameConfig.gameScene.height - currentBlob.height - 32
     );
     currentBlob.position.set(x, y);
+    currentBlob.tint = Math.random() * 0xffffff;
     if (blobConfig.direction > 0) {
       currentBlob.moves.down = blobConfig.speed;
     } else {
@@ -196,8 +187,28 @@ function setup(
     };
   });
 
+  //Cheat health key
+  const heal = new Key("h");
+  heal.press = () => {
+    gameConfig.outerBar.width += 30;
+    if (gameConfig.outerBar.width > 128) gameConfig.outerBar.width = 128;
+  };
+
   //set the state to play
   gameConfig.state = play;
+
+  //console.log(gameConfig.blobs);
+
+  //Create level message
+  gameConfig.levelText = new Text(`Level: ${gameConfig.levelCounter}`);
+  gameConfig.levelText.position.set(
+    gameConfig.gameScene.width / 2,
+    gameConfig.gameScene.height / 2
+  );
+  gameConfig.levelText.style.fill = "white";
+  gameConfig.levelText.anchor.set(0.5);
+  gameConfig.levelText.alpha = 0.5;
+  gameConfig.gameScene.addChild(gameConfig.levelText);
 
   //start the game loop
   app.ticker.add(gameLoop);
@@ -210,6 +221,24 @@ function setup(
   // setInterval(() => {
   //   outerBar.width -= 1;
   // }, 1000);
+}
+
+function buildTreasure() {
+  for (let t = 0; t < gameConfig.availableTreasures; t++) {
+    const treasure = new Sprite(gameConfig.textures!["treasure.png"]);
+    treasure.position.set(
+      RandomRange.getRandomInt(
+        gameConfig.gameScene.width / 2,
+        gameConfig.gameScene.width - treasure.width - 32
+      ),
+      RandomRange.getRandomInt(
+        gameConfig.gameScene.height / 2,
+        gameConfig.gameScene.height - treasure.height - 32
+      )
+    );
+    gameConfig.treasures.push(treasure);
+  }
+  gameConfig.gameScene.addChild(...gameConfig.treasures);
 }
 
 function gameLoop(delta: number) {
@@ -225,8 +254,12 @@ function play(delta: number) {
   Contain.hasHit(gameConfig.explorer, gameConfig.playGround);
 
   //Move the blob monsters
+  // console.log(
+  //   `${gameConfig.blobs[0].moves.up}:${gameConfig.blobs[0].moves.down}:${gameConfig.blobs[0].x}:${gameConfig.blobs[0].y}`
+  // );
   gameConfig.blobs.forEach((blob) => {
     blob.y += blob.vy();
+    //console.log(blob.vy())
     const blobHitsWall = Contain.hasHit(blob, gameConfig.playGround);
     if (blobHitsWall === "up") {
       blob.moves.down = blob.moves.up;
@@ -251,18 +284,38 @@ function play(delta: number) {
   });
 
   //Check for collision between explorer and treasure
-  gameConfig.treasures.forEach((treasure) => {
-    if (Collision.hasCollision(gameConfig.explorer, treasure)) {
-      treasure.x = gameConfig.explorer.x + 8;
-      treasure.y = gameConfig.explorer.y + 8;
+  gameConfig.treasures.forEach((treasure, index) => {
+    if (
+      Collision.hasCollision(gameConfig.explorer, treasure) &&
+      !gameConfig.explorer.hasTreasure
+    ) {
+      // treasure.x = gameConfig.explorer.x + 8;
+      // treasure.y = gameConfig.explorer.y + 8;
+      gameConfig.explorer.hasTreasure = true;
+      gameConfig.explorer.idTreasure = index;
     }
     //Check for collision between treasure and door
     if (Collision.hasCollision(treasure, gameConfig.door)) {
-      gameConfig.message.text = "You won!";
-      treasure.visible=false;
+      //gameConfig.message.text = "You won!";
+      gameConfig.explorer.hasTreasure = false;
+      gameConfig.explorer.idTreasure = undefined;
+      treasure.visible = false;
     }
   });
-  gameConfig.treasures = gameConfig.treasures.filter(treasure=>treasure.visible)
+  gameConfig.treasures = gameConfig.treasures.filter(
+    (treasure) => treasure.visible
+  );
+  if (!gameConfig.treasures.length) {
+    levelUp();
+  }
+  [];
+  if (gameConfig.explorer.hasTreasure) {
+    gameConfig.treasures[gameConfig.explorer.idTreasure as number].x =
+      gameConfig.explorer.x + 8;
+    gameConfig.treasures[gameConfig.explorer.idTreasure as number].y =
+      gameConfig.explorer.y + 8;
+  }
+  gameConfig.explorer.tint = Math.random() * 0xffffff;
 }
 
 function end(delta: number) {
@@ -275,5 +328,27 @@ function end(delta: number) {
 }
 
 function levelUp() {
-  gameConfig.state = play;
+  //sanitize();
+  //clearContainer(app.stage);
+  //console.log("level up");
+  gameConfig.levelCounter += 1;
+  gameConfig.levelText.text = `Level: ${gameConfig.levelCounter}`;
+  gameConfig.availableTreasures += 1;
+  buildTreasure();
+  gameConfig.blobs.forEach((blob) => {
+    blob.moves.up += 1;
+    blob.moves.down += 1;
+  });
+}
+
+function clearContainer(container: Container) {
+  const sprites = container.children;
+  sprites.forEach((c) => {
+    c.destroy();
+  });
+}
+
+function sanitize() {
+  gameConfig.treasures.length = 0;
+  gameConfig.blobs.length = 0;
 }
