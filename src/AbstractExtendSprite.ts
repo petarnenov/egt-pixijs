@@ -1,6 +1,6 @@
 import { Sprite, Texture } from "pixi.js";
 
-export default class Bunny extends Sprite {
+export default abstract class AbstractExtendSprite extends Sprite {
   moves = {
     left: 0,
     right: 0,

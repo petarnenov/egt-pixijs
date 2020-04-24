@@ -1,12 +1,15 @@
-import { Sprite } from "pixi.js";
+//TODO: https://github.com/kittykatattack/learningPixis
+
+import { Sprite, Ellipse } from "pixi.js";
 import Bunny from "./Bunny";
 import Key from "./Key";
-import { userInfo } from "os";
+import Collision from "./Collision";
 
 const app = new PIXI.Application({
   backgroundColor: 0xaaaaaa,
   antialias: true,
   resolution: 1,
+  transparent:false
 });
 
 document.body.appendChild(app.view);
@@ -194,7 +197,7 @@ PIXI.loader
 
     //add control keys
     const values = ["Left", "Right", "Up", "Down"];
-    const speed = 5;
+    const speed = 1;
 
     type moveAliases = "left" | "right" | "up" | "down";
 
@@ -263,47 +266,151 @@ PIXI.loader
     app.ticker.add((delta) => gameLoop(delta));
 
     //grouping sprites
-    const groupBunnys: Bunny[] = [];
-
+    const groupBunnies: Bunny[] = [];
+    const fastGroupBunnies: Bunny[] = [];
     let x = 0;
     let y = 0;
     for (let i = 1; i <= 25; i++) {
       const currentBunny = new Bunny(id["bunny3.png"]);
+      const fastCurrentBunny = new Bunny(id["bunny2.png"]);
       currentBunny.x = x * 120;
       currentBunny.y = y * 120;
+      fastCurrentBunny.x = x * 120;
+      fastCurrentBunny.y = y * 120;
+
       x++;
       if (!(i % 5)) {
         y += 1;
-        x = 0
+        x = 0;
       }
 
-      groupBunnys.push(currentBunny);
+      groupBunnies.push(currentBunny);
+      fastGroupBunnies.push(fastCurrentBunny);
     }
 
-    const containerBunnys = new PIXI.Container();
-    containerBunnys.position.set(
+    const containerBunnies = new PIXI.Container();
+    //fast container PIXI.particles.ParticleContainer
+    const fastContainerBunnies = new PIXI.particles.ParticleContainer(1500, {
+      rotation: true,
+      scale: true,
+      position: true,
+      alpha: true,
+      tint: true,
+    });
+    containerBunnies.position.set(
       app.renderer.width / 2,
       app.renderer.height / 2
     );
-    groupBunnys.forEach((b) => {
-      containerBunnys.addChild(b);
+    groupBunnies.forEach((b, index) => {
+      containerBunnies.addChild(b);
+      fastContainerBunnies.addChild(fastGroupBunnies[index]);
     });
-    containerBunnys.pivot = new PIXI.Point(
-      containerBunnys.width / 2,
-      containerBunnys.height / 2
+    containerBunnies.pivot = new PIXI.Point(
+      containerBunnies.width / 2,
+      containerBunnies.height / 2
     );
-    containerBunnys.alpha = 0.8;
-    containerBunnys.scale.set(0.5, 0.5);
-    app.stage.addChild(containerBunnys);
+    containerBunnies.alpha = 0.8;
+    containerBunnies.scale.set(0.5, 0.5);
 
-    groupBunnys.forEach(b=>{
+    fastContainerBunnies.position.set(650, 150);
+    fastContainerBunnies.pivot = new PIXI.Point(290, 290);
+    fastContainerBunnies.scale.set(0.3, 0.3);
+
+    app.stage.addChild(containerBunnies);
+    app.stage.addChild(fastContainerBunnies);
+
+    groupBunnies.forEach((b) => {
       console.log(b.getGlobalPosition());
-    })
-
-    console.log(groupBunnys[0].toLocal(groupBunnys[0].position,groupBunnys[25]).x);
-    console.log(groupBunnys[0].toLocal(groupBunnys[0].position,groupBunnys[25]).y);
-
-    app.ticker.add(() => {
-      containerBunnys.rotation += 0.01;
     });
+
+    console.log(
+      groupBunnies[0].toLocal(groupBunnies[0].position, groupBunnies[25]).x
+    );
+    console.log(
+      groupBunnies[0].toLocal(groupBunnies[0].position, groupBunnies[25]).y
+    );
+
+    delta = 0;
+    app.ticker.add(() => {
+      containerBunnies.rotation += 0.01;
+      //fastContainerBunnies.rotation += 0.1;
+      fastGroupBunnies.forEach((b) => {
+        b.x += Math.sin(delta);
+      });
+      delta += 0.05;
+    });
+
+    //PIXI Graphics
+
+    //Rectangle
+    const rectangle = new PIXI.Graphics();
+    rectangle.beginFill(0x66ccff);
+    rectangle.lineStyle(2, 0xff0000, 1);
+    rectangle.drawRect(0, 0, 50, 50);
+    rectangle.endFill();
+    rectangle.position.set(50, 200);
+    app.stage.addChild(rectangle);
+
+    //Circle
+    const circle = new PIXI.Graphics();
+    circle.beginFill(0x0000ff);
+    circle.lineStyle(2, 0xffffff, 1);
+    circle.drawCircle(0, 0, 15);
+    circle.position.set(50, 300);
+    circle.endFill();
+    app.stage.addChild(circle);
+
+    //Ellipses
+    const ellipse = new PIXI.Graphics();
+    ellipse.beginFill(0xaaaa22);
+    ellipse.lineStyle(2, 0xffffff, 1);
+    ellipse.drawEllipse(0, 0, 100, 40);
+    ellipse.position.set(150, 500);
+    ellipse.endFill();
+    app.stage.addChild(ellipse);
+
+    //Rounded rectangle
+    const roundedRectangle = new PIXI.Graphics();
+    roundedRectangle.beginFill(0x993322);
+    roundedRectangle.lineStyle(2, 0xffffff, 1);
+    roundedRectangle.drawRoundedRect(0, 0, 200, 50, 5);
+    roundedRectangle.position.set(260, 520);
+    roundedRectangle.endFill();
+    app.stage.addChild(roundedRectangle);
+
+    //Lines
+    const line = new PIXI.Graphics();
+    line.lineStyle(5, 0xffffff, 1);
+    line.moveTo(0, 0);
+    line.lineTo(100, 10);
+    line.position.set(480, 500);
+    app.stage.addChild(line);
+
+    //Polygons
+    const path = [0, 0, 0, 20, 50, 20, 0, 0];
+    const triangle = new PIXI.Graphics();
+    triangle.beginFill(0xbb3344);
+    triangle.lineStyle(2, 0xffffff, 1);
+    triangle.drawPolygon(path);
+    triangle.position.set(650, 400);
+    triangle.endFill();
+    app.stage.addChild(triangle);
+
+    //Text PIXI.Text
+    const message = new PIXI.Text("Hello, Pixi!");
+    message.style.fill = "#ffffff";
+    message.position.set(500, 550);
+    app.stage.addChild(message);
+
+    //Collision detection
+
+    app.ticker.add(collisionDetection);
+
+    function collisionDetection() {
+      if (Collision.hasCollision(bunny4, bunny1)) {
+        message.text = "Hit";
+      } else {
+        message.text = "Free ride";
+      }
+    }
   });
