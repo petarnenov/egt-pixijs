@@ -1,5 +1,5 @@
-import { Application, Container, Texture, Sprite, ticker, Text } from "pixi.js";
-
+import { Application, Container, Texture, ticker, Text } from "pixi.js";
+import ExampleSprite from "./ExampleSprite";
 export interface TickerArgs {
   fn(deltaTime: number): void;
   context?: any;
@@ -19,7 +19,7 @@ export default class Examples {
     [key: string]: Texture;
   };
   private sprites = {} as {
-    [key: string]: Sprite;
+    [key: string]: ExampleSprite;
   };
   constructor(private app: Application) {
     document.body.appendChild(app.view);
@@ -39,19 +39,21 @@ export default class Examples {
     return this.textures[textureAlias];
   }
 
-  addSprite(spriteAlias: string, spriteTextureAlias: string | Texture) {    
+  addSprite(spriteAlias: string, spriteTextureAlias: string | Texture) {
     if (
       Object.prototype.toString.call(spriteTextureAlias) === "[object String]"
     ) {
-      this.sprites[spriteAlias] = new Sprite(
+      this.sprites[spriteAlias] = new ExampleSprite(
         this.textures[spriteTextureAlias as string]
       );
     } else {
-      this.sprites[spriteAlias] = new Sprite(spriteTextureAlias as Texture);
+      this.sprites[spriteAlias] = new ExampleSprite(
+        spriteTextureAlias as Texture
+      );
     }
     return this.sprites[spriteAlias];
   }
-  addSpriteToContainer(sprite: Sprite, container: Container) {
+  addSpriteToContainer(sprite: ExampleSprite, container: Container) {
     container.addChild(sprite);
   }
   stop() {
@@ -89,5 +91,11 @@ export default class Examples {
   }
   getAllSpritesFromContainer(containerAlias: string) {
     return this.containers[containerAlias].children;
+  }
+  getRenderer() {
+    return this.app.renderer;
+  }
+  getAllSprites() {
+    return Object.values(this.sprites);
   }
 }

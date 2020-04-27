@@ -1,6 +1,9 @@
 import { Sprite, Texture } from "pixi.js";
 
 export default abstract class AbstractExtendSprite extends Sprite {
+  direction = Math.random() * Math.PI * 2;
+  turningSpeed = Math.random() - 0.8;
+  speed = 2 + Math.random() * 2;
   moves = {
     left: 0,
     right: 0,
