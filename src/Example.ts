@@ -1,4 +1,13 @@
-import { Application, Container, Texture, ticker, Text } from "pixi.js";
+import {
+  Application,
+  Container,
+  Texture,
+  ticker,
+  Text,
+  loader,
+  Sprite,
+  particles,
+} from "pixi.js";
 import ExampleSprite from "./ExampleSprite";
 export interface TickerArgs {
   fn(deltaTime: number): void;
@@ -21,6 +30,9 @@ export default class Examples {
   private sprites = {} as {
     [key: string]: ExampleSprite;
   };
+  private atlases = {} as {
+    [key: string]: any;
+  };
   constructor(private app: Application) {
     document.body.appendChild(app.view);
   }
@@ -30,6 +42,10 @@ export default class Examples {
     return this.containers[containerAlias];
   }
 
+  addParticleContainer(container: particles.ParticleContainer) {
+    this.app.stage.addChild(container);
+  }
+
   addContainerToStage(containerAlias: string) {
     this.app.stage.addChild(this.containers[containerAlias]);
   }
@@ -37,6 +53,14 @@ export default class Examples {
   addTexture(textureAlias: string, imageUrl: string) {
     this.textures[textureAlias] = Texture.fromImage(imageUrl);
     return this.textures[textureAlias];
+  }
+
+  onLoadAssets() {
+    console.log("hi");
+  }
+
+  loadAtlas(aliasAtlas: string, urlAtlas: string) {
+    loader.add(aliasAtlas, urlAtlas).load(this.onLoadAssets.bind(this));
   }
 
   addSprite(spriteAlias: string, spriteTextureAlias: string | Texture) {
@@ -53,6 +77,11 @@ export default class Examples {
     }
     return this.sprites[spriteAlias];
   }
+
+  addToSprites(spriteAlias: string, sprite: ExampleSprite) {
+    this.sprites[spriteAlias] = sprite;
+  }
+
   addSpriteToContainer(sprite: ExampleSprite, container: Container) {
     container.addChild(sprite);
   }

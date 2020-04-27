@@ -42462,12 +42462,17 @@ function () {
     this.containers = {};
     this.textures = {};
     this.sprites = {};
+    this.atlases = {};
     document.body.appendChild(app.view);
   }
 
   Examples.prototype.addContainer = function (containerAlias) {
     this.containers[containerAlias] = new pixi_js_1.Container();
     return this.containers[containerAlias];
+  };
+
+  Examples.prototype.addParticleContainer = function (container) {
+    this.app.stage.addChild(container);
   };
 
   Examples.prototype.addContainerToStage = function (containerAlias) {
@@ -42479,6 +42484,14 @@ function () {
     return this.textures[textureAlias];
   };
 
+  Examples.prototype.onLoadAssets = function () {
+    console.log("hi");
+  };
+
+  Examples.prototype.loadAtlas = function (aliasAtlas, urlAtlas) {
+    pixi_js_1.loader.add(aliasAtlas, urlAtlas).load(this.onLoadAssets.bind(this));
+  };
+
   Examples.prototype.addSprite = function (spriteAlias, spriteTextureAlias) {
     if (Object.prototype.toString.call(spriteTextureAlias) === "[object String]") {
       this.sprites[spriteAlias] = new ExampleSprite_1.default(this.textures[spriteTextureAlias]);
@@ -42487,6 +42500,10 @@ function () {
     }
 
     return this.sprites[spriteAlias];
+  };
+
+  Examples.prototype.addToSprites = function (spriteAlias, sprite) {
+    this.sprites[spriteAlias] = sprite;
   };
 
   Examples.prototype.addSpriteToContainer = function (sprite, container) {
@@ -42583,7 +42600,27 @@ function () {
 }();
 
 exports.default = BounceBox;
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"pixi-examples.ts":[function(require,module,exports) {
+},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"RandomRange.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var RandomRange =
+/** @class */
+function () {
+  function RandomRange() {}
+
+  RandomRange.getRandomInt = function (start, end) {
+    return Math.floor(Math.random() * (end - start + 1) + start);
+  };
+
+  return RandomRange;
+}();
+
+exports.default = RandomRange;
+},{}],"pixi-examples.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -42601,6 +42638,8 @@ var pixi_js_1 = require("pixi.js");
 var Example_1 = __importDefault(require("./Example"));
 
 var BounceBox_1 = __importDefault(require("./BounceBox"));
+
+var RandomRange_1 = __importDefault(require("./RandomRange"));
 
 function containerDemo() {
   var sprites = 25;
@@ -42717,10 +42756,216 @@ function tintingDemo() {
     });
   });
   tintingExample.start();
+  setTimeout(function () {
+    tintingExample.destroy();
+    cacheAsBitmapDemo();
+  }, 1000);
+}
+
+function cacheAsBitmapDemo() {
+  var app = new pixi_js_1.Application({
+    antialias: true,
+    resolution: 1,
+    autoStart: false
+  });
+  app.stage.interactive = true;
+  app.stage.on("pointertap", onTap);
+
+  function onTap() {
+    bitMapContainer.cacheAsBitmap = !bitMapContainer.cacheAsBitmap;
+  }
+
+  var bitMap = new Example_1.default(app);
+  var counter = 0;
+  var totalFruits = 100;
+  var fruitsFrame = ["tomato64.png", "pineapple64.png", "watermelon64.png", "lime64.png"];
+  var bitMapContainer = bitMap.addContainer("bitMap");
+  bitMapContainer.position.set(400, 300);
+
+  bitMap.onLoadAssets = function () {
+    var _this = this;
+
+    for (var i = 0; i < totalFruits; i++) {
+      var frameName = fruitsFrame[i % 4];
+      var fruit = pixi_js_1.Sprite.fromFrame(frameName);
+      fruit.tint = Math.random() * 0xffffff;
+      fruit.anchor.set(0.5);
+      fruit.position.set(Math.random() * 800 - 400, Math.random() * 600 - 300);
+      this.addToSprites(frameName + i, fruit);
+      bitMapContainer.addChild(fruit);
+    }
+
+    this.addToTicker(function (deltaTime) {
+      _this.getAllSprites().forEach(function (s) {
+        s.rotation += 0.1;
+      });
+
+      counter += 0.01;
+      bitMapContainer.scale.set(Math.sin(counter));
+    });
+  };
+
+  bitMap.addContainerToStage("bitMap");
+  bitMap.loadAtlas("fruits", "assets/fruits.json");
+  bitMap.start(); // document.body.appendChild(app.view);
+  // const totalFruits = 100;
+  // loader.add("fruits", "assets/fruits.json").load(onAssetsLoaded);
+  // const fruits = [] as Sprite[];
+  // const fruitsFrame = [
+  //   "tomato64.png",
+  //   "pineapple64.png",
+  //   "watermelon64.png",
+  //   "lime64.png",
+  // ];
+  // let counter = 0;
+  // const fruitsContainer = new Container();
+  // fruitsContainer.position.set(400, 300);
+  // app.stage.interactive = true;
+  // app.stage.addChild(fruitsContainer);
+  // function onAssetsLoaded() {
+  //   for (let i = 0; i < totalFruits; i++) {
+  //     const frameName = fruitsFrame[i % 4];
+  //     const fruit = Sprite.fromFrame(frameName);
+  //     fruit.tint = Math.random() * 0xffffff;
+  //     fruit.anchor.set(0.5);
+  //     fruit.position.set(Math.random() * 800 - 400, Math.random() * 600 - 300);
+  //     fruits.push(fruit);
+  //     fruitsContainer.addChild(fruit);
+  //   }
+  //   app.start();
+  // }
+  // app.stage.on("click", clickHandler);
+  // function clickHandler() {
+  //   fruitsContainer.cacheAsBitmap = !fruitsContainer.cacheAsBitmap;
+  // }
+  // app.ticker.add(() => {
+  //   fruits.forEach((f) => {
+  //     f.rotation += 0.1;
+  //   });
+  //   counter += 0.01;
+  //   fruitsContainer.scale.x = Math.sin(counter);
+  //   fruitsContainer.scale.y = Math.sin(counter);
+  //   fruitsContainer.rotation += 0.01;
+  // });
+
+  setTimeout(function () {
+    bitMap.destroy();
+    particleContainerDemo();
+  }, 3000);
+}
+
+function particleContainerDemo() {
+  var app = new pixi_js_1.Application({
+    // width: 400,
+    // height: 300,
+    antialias: true,
+    resolution: 1,
+    autoStart: false
+  });
+  var totalLarvas = 10000;
+  var particleContainerDemo = new pixi_js_1.particles.ParticleContainer(totalLarvas, {
+    scale: true,
+    position: true,
+    rotation: true,
+    uvs: true,
+    alpha: true
+  });
+  var particleContainerExample = new Example_1.default(app);
+  var tomato = particleContainerExample.addTexture("tomato", "assets/larva64.png");
+
+  for (var i = 0; i < totalLarvas; i++) {
+    var currentTomato = particleContainerExample.addSprite("tomato" + i, tomato);
+    currentTomato.tint = Math.random() * 0xe8d4cd;
+    currentTomato.anchor.set(0.5);
+    currentTomato.scale.set(Math.random() * 0.3 + 0.8);
+    currentTomato.position.set(Math.random() * app.renderer.width, Math.random() * app.renderer.height);
+    currentTomato.tint = Math.random() * 0x808080;
+    currentTomato.speed *= 0.2;
+    particleContainerDemo.addChild(currentTomato);
+  }
+
+  particleContainerExample.addParticleContainer(particleContainerDemo);
+  var larvas = particleContainerExample.getAllSprites();
+  var tick = 0;
+  var bounce = new BounceBox_1.default(app.renderer.width, app.renderer.height);
+  particleContainerExample.addToTicker(function (deltaTime) {
+    larvas.forEach(function (larva) {
+      larva.scale.y = 0.95 + Math.sin(tick) * 0.05;
+      larva.direction += larva.turningSpeed * 0.01;
+      larva.x += Math.sin(larva.direction) * (larva.speed * larva.scale.y);
+      larva.y += Math.cos(larva.direction) * (larva.speed * larva.scale.y);
+      larva.rotation = -larva.direction + Math.PI; //larva.blendMode=PIXI.BLEND_MODES.ADD;
+
+      bounce.keepSpriteInBounce(larva);
+    }); //compare forEach vs for
+    // for (let i = 0; i < totalLarvas; i++) {
+    //   const larva = larvas[i];
+    //   larva.scale.y = 0.95 + Math.sin(tick) * 0.05;
+    //   larva.direction += larva.turningSpeed * 0.01;
+    //   larva.x += Math.sin(larva.direction) * (larva.speed * larva.scale.y);
+    //   larva.y += Math.cos(larva.direction) * (larva.speed * larva.scale.y);
+    //   larva.rotation = -larva.direction + Math.PI;
+    //   bounce.keepSpriteInBounce(larva);
+    // }
+
+    tick += 0.1;
+  });
+  particleContainerExample.start();
+  setTimeout(function () {
+    particleContainerExample.destroy();
+    blendModesDemo();
+  }, 3000);
+}
+
+function blendModesDemo() {
+  var SupportedBlendModes = [PIXI.BLEND_MODES.ADD, PIXI.BLEND_MODES.SCREEN, PIXI.BLEND_MODES.MULTIPLY, PIXI.BLEND_MODES.NORMAL];
+  var app = new pixi_js_1.Application({
+    antialias: true,
+    resolution: 1,
+    autoStart: false
+  });
+  var blendModesDemo = new Example_1.default(app);
+  var backgroundTexture = blendModesDemo.addTexture("rainbow", "assets/rainbow.png");
+  var background = blendModesDemo.addSprite("background", backgroundTexture);
+  background.width = app.renderer.width;
+  background.height = app.renderer.height;
+  var blendContainer = blendModesDemo.addContainer("blend");
+  blendModesDemo.addSpriteToContainer(background, blendContainer);
+  blendModesDemo.addContainerToStage("blend");
+  var totalFaces = 20;
+  var faceTexture = blendModesDemo.addTexture("face", "assets/face.png");
+
+  for (var i = 0; i < totalFaces; i++) {
+    var face = blendModesDemo.addSprite("face" + i, faceTexture);
+    face.anchor.set(0.5);
+    face.scale.set(0.8 + Math.random() * 0.3);
+    face.position.set(Math.random() * app.renderer.width, Math.random() * app.renderer.height);
+    var randomBlendModes = RandomRange_1.default.getRandomInt(0, 3);
+    face.blendMode = SupportedBlendModes[randomBlendModes];
+    blendModesDemo.addSpriteToContainer(face, blendContainer);
+  }
+
+  var bounce = new BounceBox_1.default(app.renderer.width, app.renderer.height);
+  var faces = blendModesDemo.getAllSprites();
+  blendModesDemo.addToTicker(function (deltaTime) {
+    faces.forEach(function (face, index) {
+      if (index !== 0) {
+        face.direction += face.turningSpeed * 0.01;
+        face.x += Math.sin(face.direction) * face.speed;
+        face.y += Math.cos(face.direction) * face.speed;
+        face.rotation = -face.direction - Math.PI / 2;
+        bounce.keepSpriteInBounce(face);
+      }
+    });
+  });
+  blendModesDemo.start();
+  setTimeout(function () {
+    blendModesDemo.destroy();
+  }, 5000);
 }
 
 containerDemo();
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js","./Example":"Example.ts","./BounceBox":"BounceBox.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"pixi.js":"../node_modules/pixi.js/lib/index.js","./Example":"Example.ts","./BounceBox":"BounceBox.ts","./RandomRange":"RandomRange.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42748,7 +42993,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43377" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39853" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
