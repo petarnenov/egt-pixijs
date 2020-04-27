@@ -15,11 +15,17 @@ import ExampleSprite from "./ExampleSprite";
 import BounceBox from "./BounceBox";
 import RandomRange from "./RandomRange";
 
+const width = window.innerWidth;
+const height = window.innerHeight;
+const delayDemo = 5000;
+
 function containerDemo() {
   const sprites = 25;
   const offset = 64;
 
   const app = new Application({
+    width,
+    height,
     antialias: true,
     resolution: 1,
     autoStart: false,
@@ -62,11 +68,13 @@ function containerDemo() {
   setTimeout(() => {
     containerExample.destroy();
     transparentDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function transparentDemo() {
   const app = new Application({
+    width,
+    height,
     antialias: true,
     resolution: 1,
     transparent: true,
@@ -103,11 +111,13 @@ function transparentDemo() {
   setTimeout(() => {
     transparentExample.destroy();
     tintingDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function tintingDemo() {
   const app = new Application({
+    width,
+    height,
     resolution: 1,
     antialias: true,
   });
@@ -167,11 +177,13 @@ function tintingDemo() {
   setTimeout(() => {
     tintingExample.destroy();
     cacheAsBitmapDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function cacheAsBitmapDemo() {
   const app = new Application({
+    width,
+    height,
     antialias: true,
     resolution: 1,
     autoStart: false,
@@ -196,7 +208,7 @@ function cacheAsBitmapDemo() {
   ];
 
   const bitMapContainer = bitMap.addContainer("bitMap");
-  bitMapContainer.position.set(400, 300);
+  bitMapContainer.position.set(width / 2, height / 2);
 
   bitMap.onLoadAssets = function () {
     for (let i = 0; i < totalFruits; i++) {
@@ -204,7 +216,10 @@ function cacheAsBitmapDemo() {
       const fruit = Sprite.fromFrame(frameName) as ExampleSprite;
       fruit.tint = Math.random() * 0xffffff;
       fruit.anchor.set(0.5);
-      fruit.position.set(Math.random() * 800 - 400, Math.random() * 600 - 300);
+      fruit.position.set(
+        Math.random() * width - width / 2,
+        Math.random() * height - height / 2
+      );
 
       this.addToSprites(frameName + i, fruit);
       bitMapContainer.addChild(fruit);
@@ -277,13 +292,15 @@ function cacheAsBitmapDemo() {
   setTimeout(() => {
     bitMap.destroy();
     particleContainerDemo();
-  }, 3000);
+  }, delayDemo);
 }
 
 function particleContainerDemo() {
   const app = new Application({
     // width: 400,
     // height: 300,
+    width,
+    height,
     antialias: true,
     resolution: 1,
     autoStart: false,
@@ -354,7 +371,7 @@ function particleContainerDemo() {
   setTimeout(() => {
     particleContainerExample.destroy();
     blendModesDemo();
-  }, 3000);
+  }, delayDemo);
 }
 
 function blendModesDemo() {
@@ -366,6 +383,8 @@ function blendModesDemo() {
   ];
 
   const app = new Application({
+    width,
+    height,
     antialias: true,
     resolution: 1,
     autoStart: false,
@@ -419,7 +438,7 @@ function blendModesDemo() {
 
   setTimeout(() => {
     blendModesDemo.destroy();
-  }, 5000);
+  }, delayDemo);
 }
 
 containerDemo();

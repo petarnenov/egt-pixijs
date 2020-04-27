@@ -42641,10 +42641,16 @@ var BounceBox_1 = __importDefault(require("./BounceBox"));
 
 var RandomRange_1 = __importDefault(require("./RandomRange"));
 
+var width = window.innerWidth;
+var height = window.innerHeight;
+var delayDemo = 5000;
+
 function containerDemo() {
   var sprites = 25;
   var offset = 64;
   var app = new pixi_js_1.Application({
+    width: width,
+    height: height,
     antialias: true,
     resolution: 1,
     autoStart: false
@@ -42679,11 +42685,13 @@ function containerDemo() {
   setTimeout(function () {
     containerExample.destroy();
     transparentDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function transparentDemo() {
   var app = new pixi_js_1.Application({
+    width: width,
+    height: height,
     antialias: true,
     resolution: 1,
     transparent: true
@@ -42704,11 +42712,13 @@ function transparentDemo() {
   setTimeout(function () {
     transparentExample.destroy();
     tintingDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function tintingDemo() {
   var app = new pixi_js_1.Application({
+    width: width,
+    height: height,
     resolution: 1,
     antialias: true
   });
@@ -42759,11 +42769,13 @@ function tintingDemo() {
   setTimeout(function () {
     tintingExample.destroy();
     cacheAsBitmapDemo();
-  }, 1000);
+  }, delayDemo);
 }
 
 function cacheAsBitmapDemo() {
   var app = new pixi_js_1.Application({
+    width: width,
+    height: height,
     antialias: true,
     resolution: 1,
     autoStart: false
@@ -42780,7 +42792,7 @@ function cacheAsBitmapDemo() {
   var totalFruits = 100;
   var fruitsFrame = ["tomato64.png", "pineapple64.png", "watermelon64.png", "lime64.png"];
   var bitMapContainer = bitMap.addContainer("bitMap");
-  bitMapContainer.position.set(400, 300);
+  bitMapContainer.position.set(width / 2, height / 2);
 
   bitMap.onLoadAssets = function () {
     var _this = this;
@@ -42790,7 +42802,7 @@ function cacheAsBitmapDemo() {
       var fruit = pixi_js_1.Sprite.fromFrame(frameName);
       fruit.tint = Math.random() * 0xffffff;
       fruit.anchor.set(0.5);
-      fruit.position.set(Math.random() * 800 - 400, Math.random() * 600 - 300);
+      fruit.position.set(Math.random() * width - width / 2, Math.random() * height - height / 2);
       this.addToSprites(frameName + i, fruit);
       bitMapContainer.addChild(fruit);
     }
@@ -42851,13 +42863,15 @@ function cacheAsBitmapDemo() {
   setTimeout(function () {
     bitMap.destroy();
     particleContainerDemo();
-  }, 3000);
+  }, delayDemo);
 }
 
 function particleContainerDemo() {
   var app = new pixi_js_1.Application({
     // width: 400,
     // height: 300,
+    width: width,
+    height: height,
     antialias: true,
     resolution: 1,
     autoStart: false
@@ -42914,12 +42928,14 @@ function particleContainerDemo() {
   setTimeout(function () {
     particleContainerExample.destroy();
     blendModesDemo();
-  }, 3000);
+  }, delayDemo);
 }
 
 function blendModesDemo() {
   var SupportedBlendModes = [PIXI.BLEND_MODES.ADD, PIXI.BLEND_MODES.SCREEN, PIXI.BLEND_MODES.MULTIPLY, PIXI.BLEND_MODES.NORMAL];
   var app = new pixi_js_1.Application({
+    width: width,
+    height: height,
     antialias: true,
     resolution: 1,
     autoStart: false
@@ -42961,7 +42977,7 @@ function blendModesDemo() {
   blendModesDemo.start();
   setTimeout(function () {
     blendModesDemo.destroy();
-  }, 5000);
+  }, delayDemo);
 }
 
 containerDemo();
