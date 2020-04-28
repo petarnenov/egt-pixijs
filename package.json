@@ -21,6 +21,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "pixi.js": "^4.8.8"
+    "pixi.js": "^4.8.8",
+    "v8": "^0.1.0"
   }
 }
