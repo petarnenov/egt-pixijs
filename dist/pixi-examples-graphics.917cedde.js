@@ -42311,7 +42311,7 @@ if (typeof _deprecation2.default === 'function') {
 // Always export PixiJS globally.
 global.PIXI = exports; // eslint-disable-line
 
-},{"./polyfill":"../node_modules/pixi.js/lib/polyfill/index.js","./core":"../node_modules/pixi.js/lib/core/index.js","./deprecation":"../node_modules/pixi.js/lib/deprecation.js","./accessibility":"../node_modules/pixi.js/lib/accessibility/index.js","./extract":"../node_modules/pixi.js/lib/extract/index.js","./extras":"../node_modules/pixi.js/lib/extras/index.js","./filters":"../node_modules/pixi.js/lib/filters/index.js","./interaction":"../node_modules/pixi.js/lib/interaction/index.js","./loaders":"../node_modules/pixi.js/lib/loaders/index.js","./mesh":"../node_modules/pixi.js/lib/mesh/index.js","./particles":"../node_modules/pixi.js/lib/particles/index.js","./prepare":"../node_modules/pixi.js/lib/prepare/index.js"}],"BounceBox.ts":[function(require,module,exports) {
+},{"./polyfill":"../node_modules/pixi.js/lib/polyfill/index.js","./core":"../node_modules/pixi.js/lib/core/index.js","./deprecation":"../node_modules/pixi.js/lib/deprecation.js","./accessibility":"../node_modules/pixi.js/lib/accessibility/index.js","./extract":"../node_modules/pixi.js/lib/extract/index.js","./extras":"../node_modules/pixi.js/lib/extras/index.js","./filters":"../node_modules/pixi.js/lib/filters/index.js","./interaction":"../node_modules/pixi.js/lib/interaction/index.js","./loaders":"../node_modules/pixi.js/lib/loaders/index.js","./mesh":"../node_modules/pixi.js/lib/mesh/index.js","./particles":"../node_modules/pixi.js/lib/particles/index.js","./prepare":"../node_modules/pixi.js/lib/prepare/index.js"}],"pixi-examples-graphics.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42319,153 +42319,196 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var pixi_js_1 = require("pixi.js");
-
-var BounceBox =
-/** @class */
-function () {
-  function BounceBox(width, height) {
-    this.width = width;
-    this.height = height;
-    this.bounce = new pixi_js_1.Rectangle(0, 0, width, height);
-  }
-
-  BounceBox.prototype.keepSpriteInBounce = function (sprite) {
-    var spriteWidth = sprite.width;
-    var spriteHeight = sprite.height;
-
-    if (sprite.x < this.bounce.x - spriteWidth) {
-      sprite.x += this.bounce.width + 2 * spriteWidth;
-    } else if (sprite.x > this.bounce.x + this.bounce.width + spriteWidth) {
-      sprite.x -= this.bounce.width + 2 * spriteWidth;
-    }
-
-    if (sprite.y < this.bounce.y - spriteHeight) {
-      sprite.y += this.bounce.height + 2 * spriteHeight;
-    } else if (sprite.y > this.bounce.x + this.bounce.height + spriteHeight) {
-      sprite.y -= this.bounce.height + 2 * spriteHeight;
-    }
-  };
-
-  return BounceBox;
-}();
-
-exports.default = BounceBox;
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"pixi-examples-text.ts":[function(require,module,exports) {
-"use strict";
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var pixi_js_1 = require("pixi.js");
-
-var BounceBox_1 = __importDefault(require("./BounceBox"));
 
 var delayDemo = 3000;
 
-function textDemo() {
-  var app = initApp(); //Simple usage of the text
+function graphicSimple() {
+  var app = initApp();
+  var graphics = new pixi_js_1.Graphics(); //rectangle
 
-  var basicText = new pixi_js_1.Text("Hello, PIXIjs.");
-  basicText.anchor.set(0.5);
-  basicText.y = basicText.width / 2;
-  app.stage.addChild(basicText); //Add style
+  graphics.beginFill(0xff0000, 1);
+  graphics.lineStyle(2, 0xaaaaaa, 1);
+  graphics.drawRect(10, 10, 200, 100);
+  graphics.endFill(); //circle
 
-  var style = new pixi_js_1.TextStyle({
-    fontFamily: "Serif",
-    fontSize: 36,
-    fontWeight: "bold",
-    fill: ["#ffffff", "#ffaa99"],
-    stroke: "ff0000",
-    strokeThickness: 1,
-    dropShadow: true,
-    dropShadowColor: "0x000000",
-    dropShadowBlur: 4,
-    dropShadowAngle: Math.PI / 6,
-    dropShadowDistance: 6,
-    wordWrap: true,
-    wordWrapWidth: 400
-  });
-  var richText = new pixi_js_1.Text("Rich text with a lot of options and across multiple lines", style);
-  richText.anchor.set(0.5);
-  richText.position.set(app.renderer.width / 2, app.renderer.height / 2);
-  app.stage.addChild(richText);
-  var radian = 0;
-  var bounce = new BounceBox_1.default(app.renderer.width, app.renderer.height);
-  app.ticker.add(function () {
-    basicText.rotation += 0.01;
-    basicText.x += 3;
-    bounce.keepSpriteInBounce(basicText);
-    richText.scale.x = Math.sin(radian);
-    radian += 0.01;
-    if (radian > Math.PI * 2) radian = 0;
-  });
-  app.start();
+  graphics.beginFill(0x993300);
+  graphics.drawCircle(40, 150, 30);
+  graphics.endFill(); //ellipse
+
+  graphics.beginFill(0x00ff00);
+  graphics.drawEllipse(110, 230, 100, 50);
+  graphics.endFill(); //shape
+
+  graphics.beginFill(0x0000dd);
+  graphics.moveTo(10, 320);
+  graphics.lineTo(10, 350);
+  graphics.lineTo(30, 350);
+  graphics.lineTo(30, 320);
+  graphics.lineTo(10, 320);
+  graphics.endFill(); //star
+
+  graphics.beginFill(0xee1111);
+  graphics.drawStar(40, 400, 7, 30, 10);
+  graphics.endFill(); //polygon
+
+  var path = [10, 500, 15, 520, 20, 540, 25, 540, 30, 520, 35, 500, 10, 500];
+  graphics.beginFill(0xaa33aa);
+  graphics.drawPolygon(path);
+  graphics.endFill();
+  app.stage.addChild(graphics);
   setTimeout(function () {
-    destroy(app);
-    bitmapTextDemo();
+    destroyApp(app);
+    graphicsAdvance();
   }, delayDemo);
 }
 
-function bitmapTextDemo() {
-  var app = initApp();
-  pixi_js_1.loader.add("assets/font/desyrel.xml").load(onLoadAssets);
+graphicSimple();
 
-  function onLoadAssets() {
-    console.log("loded");
-    var bitmapFontText = new pixi_js_1.extras.BitmapText("bitmap fonts are supported\nWoo yay!", {
-      font: "50px Desyrel",
-      align: "left"
-    });
-    bitmapFontText.position.set(50, 200);
-    app.stage.addChild(bitmapFontText);
+function graphicsAdvance() {
+  //https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+  var app = initApp();
+  var graphics = new pixi_js_1.Graphics();
+  var path = new pixi_js_1.Graphics();
+  path.lineStyle(2, 0xffffff, 1); //path.beginFill(0xffffff);
+
+  path.moveTo(0, 0);
+  path.lineTo(100, 200);
+  path.lineTo(200, 200);
+  path.lineTo(240, 100);
+  path.position.set(50, 50);
+  app.stage.addChild(path);
+  var bezier = new pixi_js_1.Graphics();
+  bezier.lineStyle(20, 0xeeeeee, 0.5);
+  bezier.bezierCurveTo(100, 200, 200, 200, 240, 100);
+  bezier.position.set(50, 50);
+  app.stage.addChild(bezier); //bezier curve with texture
+
+  var texture = pixi_js_1.Texture.fromImage("assets/rainbow.png");
+  var sprite = new pixi_js_1.Sprite(texture);
+  var path2 = path.clone();
+  path2.x += 300;
+  path2.y += 50;
+  app.stage.addChild(path2);
+  var bezier2 = bezier.clone();
+  bezier2.x += 300;
+  bezier2.y += 50; //v4.8.0 not support method lineTextureStyle
+  //bezier2.lineTextureStyle(10,sprite.texture)
+
+  app.stage.addChild(bezier2); //arc
+
+  var arc = new pixi_js_1.Graphics();
+  arc.lineStyle(20, 0xaa00bb, 0.5);
+  arc.arc(600, 100, 50, 2 * Math.PI, 3 * Math.PI / 2);
+  app.stage.addChild(arc); //hole
+
+  var rectAndHole = new pixi_js_1.Graphics();
+  rectAndHole.beginFill(0x00ff00);
+  rectAndHole.drawRect(350, 350, 150, 150);
+  rectAndHole.endFill(); //INFO: v4.8.0 beginHole() not supported
+  //rectAndHole.beginHole();
+
+  rectAndHole.beginFill(0x000000);
+  rectAndHole.drawCircle(375, 375, 25);
+  rectAndHole.drawCircle(425, 425, 25);
+  rectAndHole.drawCircle(475, 475, 25); //rectAndHole.endHole();
+
+  rectAndHole.endFill();
+  app.stage.addChild(rectAndHole);
+  setTimeout(function () {
+    destroyApp(app);
+    graphicsDynamic();
+  }, delayDemo);
+}
+
+function graphicsDynamic() {
+  var app = initApp();
+  var graphics = new pixi_js_1.Graphics();
+  app.stage.interactive = true; //interaction
+  //app.renderer.plugins.interaction.on("pointertap",onDrawBezier)
+
+  app.renderer.plugins.interaction.on("pointerdown", onDrawBezier); //app.stage.on("pointertap", onDrawBezier);
+  //use interactionManager
+  //   const im = new interaction.InteractionManager(app.renderer);
+  //   im.on("pointerdown", onDrawBezier);
+
+  function onDrawBezier() {
+    console.log("draw");
+    graphics.lineStyle(Math.random() * 30, +Math.random().toString().slice(2, 8), Math.random());
+    graphics.moveTo(Math.random() * 800, Math.random() * 600);
+    graphics.bezierCurveTo(Math.random() * 800, Math.random() * 600, Math.random() * 800, Math.random() * 600, Math.random() * 800, Math.random() * 600);
   }
 
-  app.start();
-  setTimeout(function () {
-    destroy(app);
-    webFontDemo();
-  }, delayDemo);
-}
+  graphics.lineStyle(10, 0xffd900, 1);
+  graphics.beginFill(0xff3300); //draw a shape
 
-function webFontDemo() {
-  var app = initApp();
-  var textSample = new pixi_js_1.Text("Pixi.js text using the\ncustom Snippet Webfont", {
-    fontFamily: "Snippet",
-    fill: "white",
-    fontSize: 50,
-    align: "left"
+  graphics.moveTo(50, 50);
+  graphics.lineTo(250, 50);
+  graphics.lineTo(100, 100);
+  graphics.lineTo(250, 220);
+  graphics.lineTo(50, 220);
+  graphics.lineTo(50, 50);
+  graphics.endFill(); //preset a file and lineStyle
+
+  graphics.lineStyle(10, 0xff0000, 0.8);
+  graphics.beginFill(0xff700b, 1); //draw a shape
+
+  graphics.moveTo(210, 300);
+  graphics.lineTo(450, 320);
+  graphics.lineTo(570, 350);
+  graphics.quadraticCurveTo(600, 0, 480, 100);
+  graphics.lineTo(330, 120);
+  graphics.lineTo(410, 200);
+  graphics.lineTo(210, 300);
+  graphics.endFill(); //draw a rectangle
+
+  graphics.beginFill(0x0000ff, 1);
+  graphics.drawRect(50, 250, 100, 100); //draw a circle
+
+  graphics.lineStyle(0);
+  graphics.beginFill(0xffff0b, 0.5);
+  graphics.drawCircle(470, 200, 100);
+  graphics.endFill(); //draw a line
+
+  graphics.lineStyle(20, 0x33ff00);
+  graphics.moveTo(30, 30);
+  graphics.lineTo(600, 300);
+  app.stage.addChild(graphics); //create a moving shape
+
+  var thing = new pixi_js_1.Graphics();
+  app.stage.addChild(thing);
+  thing.position.set(400, 300);
+  var count = 0;
+  app.ticker.add(function () {
+    count += 0.1;
+    thing.clear();
+    thing.lineStyle(10, 0xff0000, 1);
+    thing.beginFill(0xffff00, 0.5);
+    thing.moveTo(-120 + Math.sin(count) * 20, -100 + Math.cos(count) * 20);
+    thing.lineTo(120 + Math.cos(count) * 20, -100 + Math.sin(count) * 20);
+    thing.lineTo(120 + Math.sin(count) * 20, 100 + Math.cos(count) * 20);
+    thing.lineTo(-120 + Math.cos(count) * 20, 100 + Math.sin(count) * 20);
+    thing.lineTo(-120 + Math.sin(count) * 20, -100 + Math.cos(count) * 20);
+    thing.rotation = count * 0.1;
   });
-  textSample.position.set(50, 200);
-  app.stage.addChild(textSample);
-  app.start();
   setTimeout(function () {
-    destroy(app);
+    destroyApp(app);
   }, delayDemo);
-}
-
-textDemo();
-
-function destroy(app) {
-  document.body.removeChild(app.view);
-  app.destroy();
 }
 
 function initApp() {
   var app = new pixi_js_1.Application({
-    backgroundColor: 0x993300,
-    autoStart: false
+    antialias: true,
+    resolution: 1
   });
   document.body.appendChild(app.view);
   return app;
 }
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js","./BounceBox":"BounceBox.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+function destroyApp(app) {
+  document.body.removeChild(app.view);
+  app.destroy();
+}
+},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42493,7 +42536,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43657" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36053" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -42669,5 +42712,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel/src/builtins/hmr-runtime.js","pixi-examples-text.ts"], null)
-//# sourceMappingURL=/pixi-examples-text.555baa18.js.map
+},{}]},{},["../node_modules/parcel/src/builtins/hmr-runtime.js","pixi-examples-graphics.ts"], null)
+//# sourceMappingURL=/pixi-examples-graphics.917cedde.js.map

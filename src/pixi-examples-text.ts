@@ -1,7 +1,5 @@
 import {
-  Sprite,
   Text,
-  Container,
   Application,
   TextStyle,
   loader,

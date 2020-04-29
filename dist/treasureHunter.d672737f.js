@@ -42311,7 +42311,89 @@ if (typeof _deprecation2.default === 'function') {
 // Always export PixiJS globally.
 global.PIXI = exports; // eslint-disable-line
 
-},{"./polyfill":"../node_modules/pixi.js/lib/polyfill/index.js","./core":"../node_modules/pixi.js/lib/core/index.js","./deprecation":"../node_modules/pixi.js/lib/deprecation.js","./accessibility":"../node_modules/pixi.js/lib/accessibility/index.js","./extract":"../node_modules/pixi.js/lib/extract/index.js","./extras":"../node_modules/pixi.js/lib/extras/index.js","./filters":"../node_modules/pixi.js/lib/filters/index.js","./interaction":"../node_modules/pixi.js/lib/interaction/index.js","./loaders":"../node_modules/pixi.js/lib/loaders/index.js","./mesh":"../node_modules/pixi.js/lib/mesh/index.js","./particles":"../node_modules/pixi.js/lib/particles/index.js","./prepare":"../node_modules/pixi.js/lib/prepare/index.js"}],"AbstractExtendSprite.ts":[function(require,module,exports) {
+},{"./polyfill":"../node_modules/pixi.js/lib/polyfill/index.js","./core":"../node_modules/pixi.js/lib/core/index.js","./deprecation":"../node_modules/pixi.js/lib/deprecation.js","./accessibility":"../node_modules/pixi.js/lib/accessibility/index.js","./extract":"../node_modules/pixi.js/lib/extract/index.js","./extras":"../node_modules/pixi.js/lib/extras/index.js","./filters":"../node_modules/pixi.js/lib/filters/index.js","./interaction":"../node_modules/pixi.js/lib/interaction/index.js","./loaders":"../node_modules/pixi.js/lib/loaders/index.js","./mesh":"../node_modules/pixi.js/lib/mesh/index.js","./particles":"../node_modules/pixi.js/lib/particles/index.js","./prepare":"../node_modules/pixi.js/lib/prepare/index.js"}],"Key.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Key =
+/** @class */
+function () {
+  function Key(value) {
+    this.value = value;
+    this.isDown = false;
+    this.isUp = true;
+    this.press = undefined;
+    this.release = undefined;
+    window.addEventListener("keydown", this.downHandler.bind(this), false);
+    window.addEventListener("keyup", this.upHandler.bind(this), false);
+  }
+
+  Key.prototype.downHandler = function (event) {
+    if (event.key === this.value) {
+      if (this.isUp && this.press) this.press();
+      this.isDown = true;
+      this.isUp = false;
+      event.preventDefault();
+    }
+  };
+
+  Key.prototype.upHandler = function (event) {
+    if (event.key === this.value) {
+      if (this.isDown && this.release) this.release();
+      this.isDown = false;
+      this.isUp = true;
+      event.preventDefault();
+    }
+  };
+
+  Key.prototype.unsubscribe = function () {
+    window.removeEventListener("keydown", this.downHandler);
+    window.removeEventListener("keyup", this.upHandler);
+  };
+
+  return Key;
+}();
+
+exports.default = Key;
+},{}],"Collision.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Collision =
+/** @class */
+function () {
+  function Collision() {}
+
+  Collision.hasCollision = function (spriteOne, spriteTwo) {
+    var abs = Math.abs;
+    var metrics = {
+      deltaX: abs(spriteOne.x - spriteTwo.x),
+      deltaY: abs(spriteOne.y - spriteTwo.y),
+      maxX: spriteOne.width / 2 + spriteTwo.width / 2,
+      maxY: spriteOne.height / 2 + spriteTwo.height / 2
+    };
+    var hit = false;
+
+    if (metrics.deltaX < metrics.maxX) {
+      if (metrics.deltaY < metrics.maxY) {
+        hit = true;
+      }
+    }
+
+    return hit;
+  };
+
+  return Collision;
+}();
+
+exports.default = Collision;
+},{}],"AbstractExtendSprite.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -42378,7 +42460,7 @@ function (_super) {
 }(pixi_js_1.Sprite);
 
 exports.default = AbstractExtendSprite;
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"ExampleSprite.ts":[function(require,module,exports) {
+},{"pixi.js":"../node_modules/pixi.js/lib/index.js"}],"Explorer.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -42419,149 +42501,140 @@ Object.defineProperty(exports, "__esModule", {
 
 var AbstractExtendSprite_1 = __importDefault(require("./AbstractExtendSprite"));
 
-var ExampleSprite =
+var Explorer =
 /** @class */
 function (_super) {
-  __extends(ExampleSprite, _super);
+  __extends(Explorer, _super);
 
-  function ExampleSprite(texture) {
+  function Explorer(texture) {
+    var _this = _super.call(this, texture) || this;
+
+    _this.hasTreasure = false;
+    _this.idTreasure = undefined;
+    return _this;
+  }
+
+  return Explorer;
+}(AbstractExtendSprite_1.default);
+
+exports.default = Explorer;
+},{"./AbstractExtendSprite":"AbstractExtendSprite.ts"}],"Blob.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var AbstractExtendSprite_1 = __importDefault(require("./AbstractExtendSprite"));
+
+var Blob =
+/** @class */
+function (_super) {
+  __extends(Blob, _super);
+
+  function Blob(texture) {
     return _super.call(this, texture) || this;
   }
 
-  return ExampleSprite;
+  return Blob;
 }(AbstractExtendSprite_1.default);
 
-exports.default = ExampleSprite;
-},{"./AbstractExtendSprite":"AbstractExtendSprite.ts"}],"Example.ts":[function(require,module,exports) {
+exports.default = Blob;
+},{"./AbstractExtendSprite":"AbstractExtendSprite.ts"}],"RandomRange.ts":[function(require,module,exports) {
 "use strict";
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var pixi_js_1 = require("pixi.js");
-
-var ExampleSprite_1 = __importDefault(require("./ExampleSprite"));
-
-var Examples =
+var RandomRange =
 /** @class */
 function () {
-  function Examples(app) {
-    this.app = app;
-    this.fpsMessage = new pixi_js_1.Text("FPS", {
-      fill: "white",
-      fontFamily: "serif",
-      fontSize: "16px"
-    });
-    this.containers = {};
-    this.textures = {};
-    this.sprites = {};
-    this.atlases = {};
-    document.body.appendChild(app.view);
-  }
+  function RandomRange() {}
 
-  Examples.prototype.addContainer = function (containerAlias) {
-    this.containers[containerAlias] = new pixi_js_1.Container();
-    return this.containers[containerAlias];
+  RandomRange.getRandomInt = function (start, end) {
+    return Math.floor(Math.random() * (end - start + 1) + start);
   };
 
-  Examples.prototype.addParticleContainer = function (container) {
-    this.app.stage.addChild(container);
-  };
-
-  Examples.prototype.addContainerToStage = function (containerAlias) {
-    this.app.stage.addChild(this.containers[containerAlias]);
-  };
-
-  Examples.prototype.addTexture = function (textureAlias, imageUrl) {
-    this.textures[textureAlias] = pixi_js_1.Texture.fromImage(imageUrl);
-    return this.textures[textureAlias];
-  };
-
-  Examples.prototype.onLoadAssets = function () {
-    console.log("hi");
-  };
-
-  Examples.prototype.loadAtlas = function (aliasAtlas, urlAtlas) {
-    pixi_js_1.loader.add(aliasAtlas, urlAtlas).load(this.onLoadAssets.bind(this));
-  };
-
-  Examples.prototype.addSprite = function (spriteAlias, spriteTextureAlias) {
-    if (Object.prototype.toString.call(spriteTextureAlias) === "[object String]") {
-      this.sprites[spriteAlias] = new ExampleSprite_1.default(this.textures[spriteTextureAlias]);
-    } else {
-      this.sprites[spriteAlias] = new ExampleSprite_1.default(spriteTextureAlias);
-    }
-
-    return this.sprites[spriteAlias];
-  };
-
-  Examples.prototype.addToSprites = function (spriteAlias, sprite) {
-    this.sprites[spriteAlias] = sprite;
-  };
-
-  Examples.prototype.addSpriteToContainer = function (sprite, container) {
-    container.addChild(sprite);
-  };
-
-  Examples.prototype.stop = function () {
-    this.app.stop();
-  };
-
-  Examples.prototype.start = function () {
-    this.app.stage.addChild(this.fpsMessage);
-    this.app.ticker.add(this.refreshFpsMessage.bind(this));
-    this.app.start();
-  };
-
-  Examples.prototype.getSprite = function (spriteAlias) {
-    return this.sprites[spriteAlias];
-  };
-
-  Examples.prototype.getContainer = function (containerAlias) {
-    return this.containers[containerAlias];
-  };
-
-  Examples.prototype.addToTicker = function (cb) {
-    this.app.ticker.add(cb);
-  };
-
-  Examples.prototype.destroy = function () {
-    document.body.removeChild(this.app.view);
-    this.app.destroy();
-  };
-
-  Examples.prototype.getFPS = function () {
-    return this.app.ticker.FPS ^ 0;
-  };
-
-  Examples.prototype.refreshFpsMessage = function () {
-    this.fpsMessage.text = "FPS: " + this.getFPS();
-  };
-
-  Examples.prototype.getAllSpritesFromContainer = function (containerAlias) {
-    return this.containers[containerAlias].children;
-  };
-
-  Examples.prototype.getRenderer = function () {
-    return this.app.renderer;
-  };
-
-  Examples.prototype.getAllSprites = function () {
-    return Object.values(this.sprites);
-  };
-
-  return Examples;
+  return RandomRange;
 }();
 
-exports.default = Examples;
-},{"pixi.js":"../node_modules/pixi.js/lib/index.js","./ExampleSprite":"ExampleSprite.ts"}],"pixi-examples-sprite.ts":[function(require,module,exports) {
+exports.default = RandomRange;
+},{}],"Contain.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Contain =
+/** @class */
+function () {
+  function Contain() {}
+
+  Contain.hasHit = function (sprite, container) {
+    var hit = "free";
+
+    if (sprite.x < container.x) {
+      sprite.x = container.x;
+      hit = "left";
+    }
+
+    if (sprite.y < container.y) {
+      sprite.y = container.y;
+      hit = "up";
+    }
+
+    if (sprite.x + sprite.width > container.width) {
+      sprite.x = container.width - sprite.width;
+      hit = "right";
+    }
+
+    if (sprite.y + sprite.height > container.height) {
+      sprite.y = container.height - sprite.height;
+      hit = "down";
+    }
+
+    return hit;
+  };
+
+  return Contain;
+}();
+
+exports.default = Contain;
+},{}],"treasureHunter.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -42574,284 +42647,317 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Example_1 = __importDefault(require("./Example"));
-
 var pixi_js_1 = require("pixi.js");
 
-init();
+var Key_1 = __importDefault(require("./Key"));
 
-function init() {
-  // const width = window.innerWidth;
-  // const height = window.innerHeight;
-  var width = 800;
-  var height = 600;
-  var delayDemo = 3000;
-  var app = getApp();
-  app.loader.add("explosion", "assets/explosion/explosion.json").load(spriteBasic);
+var Collision_1 = __importDefault(require("./Collision"));
 
-  function getApp() {
-    return new pixi_js_1.Application({
-      width: width,
-      height: height,
-      antialias: true,
-      resolution: 1,
-      autoStart: false
-    });
-  } // const screenWidth = app.screen.width;
-  // const screenHeight = app.screen.height;
+var Explorer_1 = __importDefault(require("./Explorer"));
 
+var Blob_1 = __importDefault(require("./Blob"));
 
-  function spriteBasic() {
-    var app = getApp();
-    var basicExample = new Example_1.default(app);
-    var faceContainer = basicExample.addContainer("faces");
-    var faceTexture = basicExample.addTexture("face", "assets/face.png");
-    var face = basicExample.addSprite("face0", faceTexture);
-    face.anchor.set(0.5);
-    face.position.set(width / 2, height / 2);
-    basicExample.addSpriteToContainer(face, faceContainer);
-    basicExample.addContainerToStage("faces");
-    basicExample.addToTicker(function (deltaTime) {
-      face.rotation += 0.01;
-    });
-    basicExample.start();
-    setTimeout(function () {
-      basicExample.destroy();
-      textureSwapExample();
-    }, delayDemo);
+var RandomRange_1 = __importDefault(require("./RandomRange"));
+
+var Contain_1 = __importDefault(require("./Contain"));
+
+var app = new pixi_js_1.Application({
+  antialias: true,
+  resolution: 1,
+  backgroundColor: 0x993344
+});
+document.body.appendChild(app.view);
+var gameConfig = {
+  state: function state(delta) {},
+  availableTreasures: 1,
+  blobs: [],
+  explorer: {},
+  explorerSpeed: 3,
+  outerBar: {},
+  gameScene: {},
+  gameOverScene: {},
+  treasures: [],
+  door: {},
+  message: {},
+  keys: [],
+  textures: PIXI.utils.TextureCache,
+  levelText: {},
+  levelCounter: 1,
+  playGround: {
+    x: 28,
+    y: 10,
+    width: 480,
+    height: 480
   }
+}; // let state: Function;
+// const blobs: Blob[] = [];
+// let explorer: Explorer;
+// const explorerSpeed = 3;
+// let outerBar: Graphics;
+// let gameScene: Container;
+// let gameOverScene: Container;
+// let treasure: Sprite;
+// let door: Sprite;
+// let message: Text;
+// const keys: Key[] = [];
+// let nextLevel: Function;
+// const treasures: Sprite[] = [];
+// const playGround = {
+//   x: 28,
+//   y: 10,
+//   width: 448,
+//   height: 480,
+// };
 
-  function textureSwapExample() {
-    //const app = getApp();
-    var hasTaped = false;
-    var textureSwapExample = new Example_1.default(app);
-    var container = textureSwapExample.addContainer("fruits");
-    var tomatoTexture = textureSwapExample.addTexture("tomato", "assets/tomato64.png");
-    var pineappleTexture = textureSwapExample.addTexture("pineapple", "assets/pineapple64.png");
-    var dude = textureSwapExample.addSprite("dude", tomatoTexture);
-    dude.anchor.set(0.5);
-    dude.position.set(width / 2, height / 2);
-    dude.interactive = true;
-    dude.buttonMode = true;
-    dude.on("pointertap", function (e) {
-      hasTaped = !hasTaped;
+app.loader.add("./assets/treasureHunter.json").load(setup);
 
-      if (hasTaped) {
-        dude.texture = tomatoTexture;
-        dude.scale.set(1);
-      } else {
-        dude.texture = pineappleTexture;
-        dude.scale.set(2);
-      }
-    });
-    textureSwapExample.addSpriteToContainer(dude, container);
-    textureSwapExample.addContainerToStage("fruits");
-    textureSwapExample.addToTicker(function (deltaTime) {
-      dude.rotation += 0.01;
-    });
-    textureSwapExample.start();
-    setTimeout(function () {
-      textureSwapExample.destroy();
-      spriteExplosion();
-    }, delayDemo);
-  }
+function setup() {
+  //TODO: Initialize the game sprites, set the game "state" to "play"
+  //and start the gameLoop
+  var _a; //Create the "gameScene"
 
-  function spriteExplosion() {
-    var app = getApp();
-    document.body.appendChild(app.view); // app.loader
-    //   .add("explosion", "assets/explosion/explosion.json")
-    //   .load(onLoadAssets);
-    // function onLoadAssets() {
 
-    demo();
+  gameConfig.gameScene = new pixi_js_1.Container();
+  app.stage.addChild(gameConfig.gameScene);
+  gameConfig.textures = PIXI.utils.TextureCache; //Create Dungeon
 
-    function demo() {
-      var explosionTextures = [];
+  var dungeon = new pixi_js_1.Sprite(gameConfig.textures["dungeon.png"]);
+  gameConfig.gameScene.addChild(dungeon); //Create the "door" sprite
 
-      for (var i = 0; i < 10; i++) {
-        var currentExplosion = PIXI.Texture.fromFrame("exp" + i + ".png");
-        explosionTextures.push(currentExplosion);
-      }
+  gameConfig.door = new pixi_js_1.Sprite(gameConfig.textures["door.png"]);
+  gameConfig.door.position.set(32, 0);
+  gameConfig.gameScene.addChild(gameConfig.door); //Create the "player" sprite
 
-      for (var i = 0; i < 20; i++) {
-        var exp = new PIXI.extras.AnimatedSprite(explosionTextures); //exp.position.set(width / 2, height / 2);
+  gameConfig.explorer = new Explorer_1.default(gameConfig.textures["explorer.png"]);
+  gameConfig.explorer.position.set(64, gameConfig.gameScene.height / 2 - gameConfig.explorer.height / 2);
+  gameConfig.gameScene.addChild(gameConfig.explorer); //Create the "treasure" sprite
 
-        exp.position.set(Math.random() * width, Math.random() * height); //exp.anchor.set(0.5);
+  buildTreasure();
+  var blobConfig = {
+    numberOfBlobs: 8,
+    spacing: 48,
+    xOffset: 96,
+    speed: 2,
+    direction: 1
+  };
 
-        exp.rotation = Math.random() * Math.PI;
-        exp.updateAnchor = true;
-        exp.animationSpeed = Math.random(); //play random texture from texture array
-        //exp.gotoAndPlay(Math.random() * 11);
+  for (var i = 0; i < blobConfig.numberOfBlobs; i++) {
+    var currentBlob = new Blob_1.default(gameConfig.textures["blob.png"]);
+    var x = blobConfig.spacing * i + blobConfig.xOffset;
+    var y = RandomRange_1.default.getRandomInt(32, gameConfig.gameScene.height - currentBlob.height - 32);
+    currentBlob.position.set(x, y);
+    currentBlob.tint = Math.random() * 0xffffff;
 
-        exp.play();
-        app.stage.addChild(exp);
-      }
-
-      var index = 0; // app.ticker.add(() => {
-      //   if (index % 10) {
-      //     exp.position.y -= 20 * (index % 10);
-      //   } else {
-      //     exp.position.y = height / 2;
-      //     index=0;
-      //   }
-      //   exp.gotoAndPlay(index % 10);
-      //   index++;
-      // });
-
-      app.start();
-      setTimeout(function () {
-        document.body.removeChild(app.view);
-        app.destroy();
-        spriteJet();
-      }, delayDemo);
-    }
-  }
-
-  function spriteJet() {
-    var app = getApp();
-    document.body.appendChild(app.view); // app.loader
-    //   .add("explosion", "assets/explosion/explosion.json")
-    //   .load(onLoadAssets);
-    //function onLoadAssets() {
-
-    demo();
-
-    function demo() {
-      var expTextures = [];
-
-      for (var i = 0; i < 11; i++) {
-        var exp = pixi_js_1.Texture.fromFrame("exp" + i + ".png");
-        expTextures.push(exp);
-      }
-
-      var explosion = new PIXI.extras.AnimatedSprite(expTextures);
-      explosion.anchor.set(0.5);
-      explosion.position.set(width / 2, height / 2);
-      explosion.animationSpeed = 0.1; //explosion.updateAnchor=true;
-
-      explosion.play();
-      app.stage.addChild(explosion);
-      app.ticker.add(function () {
-        explosion.rotation += 0.01;
-      });
-      app.start();
-      setTimeout(function () {
-        //console.log("remove");
-        document.body.removeChild(app.view);
-        app.destroy();
-        spriteSpeed();
-      }, delayDemo);
-    }
-  }
-
-  function spriteSpeed() {
-    var app = getApp();
-    document.body.appendChild(app.view); // app.loader
-    //   .add("explosion", "assets/explosion/explosion.json")
-    //   .load(onLoadAssets);
-    // function onLoadAssets(
-    //   loader: loaders.Loader,
-    //   resources: PIXI.loaders.Resource
-    // )
-
-    demo();
-
-    function demo() {
-      var explosionTextures = [];
-
-      for (var i = 0; i < 11; i++) {
-        var frameKey = "exp" + i + ".png";
-        var texture = pixi_js_1.Texture.fromFrame("exp" + i + ".png"); //FIXME: set proper type to resource.explosion
-        //const time = resources.explosion.data.frames[frameKey].duration;
-
-        explosionTextures.push({
-          texture: texture,
-          time: 16
-        });
-      }
-
-      var explosion = new PIXI.extras.AnimatedSprite(explosionTextures);
-      explosion.anchor.set(0.5);
-      explosion.position.set(width / 2, height / 2);
-      explosion.animationSpeed = 0.1;
-      explosion.play();
-      app.stage.addChild(explosion);
-      app.start();
-      setTimeout(function () {
-        document.body.removeChild(app.view);
-        app.destroy();
-        spriteTiling();
-      }, delayDemo);
+    if (blobConfig.direction > 0) {
+      currentBlob.moves.down = blobConfig.speed;
+    } else {
+      currentBlob.moves.up = blobConfig.speed;
     }
 
-    function spriteTiling() {
-      var app = getApp();
-      document.body.appendChild(app.view);
-      var texture = pixi_js_1.Texture.fromImage("assets/sand.jpg");
-      var tilingSprite = new pixi_js_1.extras.TilingSprite(texture, app.screen.width, app.screen.height); //const mess = new Text("Hello");
-
-      app.stage.addChild(tilingSprite);
-      var count = 0;
-      app.ticker.add(function () {
-        count += 0.005;
-        tilingSprite.tileScale.x = 2 + Math.sin(count);
-        tilingSprite.tileScale.y = 2 + Math.cos(count);
-        tilingSprite.tilePosition.x += 1;
-        tilingSprite.tilePosition.y += 1;
-      });
-      app.start();
-      setTimeout(function () {
-        document.body.removeChild(app.view);
-        app.destroy();
-        spriteVideo();
-      }, delayDemo);
-    }
-
-    function spriteVideo() {
-      var app = getApp();
-      document.body.appendChild(app.view);
-      var buttonPlay = new pixi_js_1.Graphics().beginFill(0xff0000, 0.5).drawRoundedRect(0, 0, 100, 100, 10).endFill().beginFill(0xffffff).moveTo(36, 30).lineTo(36, 70).lineTo(70, 50).endFill();
-      buttonPlay.interactive = true;
-      buttonPlay.buttonMode = true;
-      buttonPlay.on("pointertap", onPlay);
-      var buttonStop = new pixi_js_1.Graphics().beginFill(0xff0000, 0.5).drawRoundedRect(0, 0, 100, 100, 10).endFill().beginFill(0xffffff).moveTo(36, 30).lineTo(36, 70).lineTo(70, 70).lineTo(70, 30).endFill();
-      buttonStop.interactive = true;
-      buttonStop.buttonMode = true;
-      buttonStop.visible = false;
-      app.stage.addChild(buttonPlay);
-      app.stage.addChild(buttonStop);
-
-      function onPlay() {
-        buttonPlay.destroy();
-        buttonStop.on("pointertap", onStop);
-        buttonStop.visible = true;
-        var videoTexture = pixi_js_1.Texture.fromVideo("assets/funny512.mp4", undefined, undefined, false);
-        var video = new pixi_js_1.Sprite(videoTexture);
-        var videoSource = videoTexture.baseTexture.source;
-        video.anchor.set(0.5);
-        video.position.set(width / 2, height / 2);
-        app.stage.addChild(video);
-        videoSource.play();
-
-        function onStop() {
-          buttonStop.destroy();
-          videoSource.pause();
-          document.body.removeChild(app.view);
-          videoTexture.destroy();
-          video.destroy();
-          app.destroy();
-        }
-      }
-
-      app.start();
-      setTimeout(function () {
-        document.body.removeChild(app.view);
-        app.destroy();
-      }, delayDemo);
-    }
+    blobConfig.direction *= -1;
+    gameConfig.blobs.push(currentBlob);
   }
+
+  (_a = gameConfig.gameScene).addChild.apply(_a, gameConfig.blobs); //Create the "health" bar
+
+
+  var healthBar = new pixi_js_1.Container();
+  var innerBar = new pixi_js_1.Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRect(0, 0, 128, 8);
+  innerBar.endFill();
+  gameConfig.outerBar = new pixi_js_1.Graphics();
+  gameConfig.outerBar.beginFill(0xff0000);
+  gameConfig.outerBar.drawRect(0, 0, 128, 8);
+  gameConfig.outerBar.endFill();
+  healthBar.addChild(innerBar);
+  healthBar.addChild(gameConfig.outerBar);
+  healthBar.position.set(gameConfig.gameScene.width - 160, 4);
+  gameConfig.gameScene.addChild(healthBar); //Create the "gameOverScene" group
+
+  gameConfig.gameOverScene = new pixi_js_1.Container();
+  gameConfig.gameOverScene.visible = false;
+  app.stage.addChild(gameConfig.gameOverScene); //Add some text for the game over message
+
+  var style = new pixi_js_1.TextStyle({
+    fontFamily: "Future",
+    fontSize: 64,
+    fill: "white"
+  });
+  gameConfig.message = new pixi_js_1.Text("The End!", style);
+  gameConfig.message.position.set(120, app.stage.height / 2 - 32);
+  gameConfig.gameOverScene.addChild(gameConfig.message); //Assign the player's keyboard controllers
+
+  var left = new Key_1.default("ArrowLeft");
+  var up = new Key_1.default("ArrowUp");
+  var right = new Key_1.default("ArrowRight");
+  var down = new Key_1.default("ArrowDown");
+  var name = ["left", "up", "right", "down"];
+  gameConfig.keys = [left, up, right, down];
+  gameConfig.keys.forEach(function (k, index) {
+    k.press = function () {
+      gameConfig.explorer.moves[name[index]] = gameConfig.explorerSpeed;
+    };
+
+    k.release = function () {
+      gameConfig.explorer.moves[name[index]] = 0;
+    };
+  }); //Cheat health key
+
+  var heal = new Key_1.default("h");
+
+  heal.press = function () {
+    gameConfig.outerBar.width += 30;
+    if (gameConfig.outerBar.width > 128) gameConfig.outerBar.width = 128;
+  }; //set the state to play
+
+
+  gameConfig.state = play; //console.log(gameConfig.blobs);
+  //Create level message
+
+  gameConfig.levelText = new pixi_js_1.Text("Level: " + gameConfig.levelCounter);
+  gameConfig.levelText.position.set(gameConfig.gameScene.width / 2, gameConfig.gameScene.height / 2);
+  gameConfig.levelText.style.fill = "white";
+  gameConfig.levelText.anchor.set(0.5);
+  gameConfig.levelText.alpha = 0.5;
+  gameConfig.gameScene.addChild(gameConfig.levelText); //start the game loop
+
+  app.ticker.add(gameLoop); // app.ticker.add(() => {
+  //   blobs.forEach((b) => {
+  //     b.x += b.vx();
+  //     b.y += b.vy();
+  //   });
+  // });
+  // setInterval(() => {
+  //   outerBar.width -= 1;
+  // }, 1000);
 }
-},{"./Example":"Example.ts","pixi.js":"../node_modules/pixi.js/lib/index.js"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+function buildTreasure() {
+  var _a;
+
+  for (var t = 0; t < gameConfig.availableTreasures; t++) {
+    var treasure = new pixi_js_1.Sprite(gameConfig.textures["treasure.png"]);
+    treasure.position.set(RandomRange_1.default.getRandomInt(gameConfig.gameScene.width / 2, gameConfig.gameScene.width - treasure.width - 32), RandomRange_1.default.getRandomInt(gameConfig.gameScene.height / 2, gameConfig.gameScene.height - treasure.height - 32));
+    gameConfig.treasures.push(treasure);
+  }
+
+  (_a = gameConfig.gameScene).addChild.apply(_a, gameConfig.treasures);
+}
+
+function gameLoop(delta) {
+  //TODO: run the current game "state" in the loop and render the sprites
+  gameConfig.state(delta);
+}
+
+function play(delta) {
+  //TODO: All the game logic stays here
+  //Move the explorer and keep in boundary
+  gameConfig.explorer.x += gameConfig.explorer.vx();
+  gameConfig.explorer.y += gameConfig.explorer.vy();
+  Contain_1.default.hasHit(gameConfig.explorer, gameConfig.playGround); //Move the blob monsters
+  // console.log(
+  //   `${gameConfig.blobs[0].moves.up}:${gameConfig.blobs[0].moves.down}:${gameConfig.blobs[0].x}:${gameConfig.blobs[0].y}`
+  // );
+
+  gameConfig.blobs.forEach(function (blob) {
+    blob.y += blob.vy(); //console.log(blob.vy())
+
+    var blobHitsWall = Contain_1.default.hasHit(blob, gameConfig.playGround);
+
+    if (blobHitsWall === "up") {
+      blob.moves.down = blob.moves.up;
+      blob.moves.up = 0;
+    }
+
+    if (blobHitsWall === "down") {
+      blob.moves.up = blob.moves.down;
+      blob.moves.down = 0;
+    } //Check for collision between blob and explorer
+
+
+    if (Collision_1.default.hasCollision(blob, gameConfig.explorer)) {
+      gameConfig.explorer.alpha = 0.5;
+      gameConfig.outerBar.width -= 1;
+
+      if (gameConfig.outerBar.width < 1) {
+        gameConfig.message.text = "You lost!";
+        gameConfig.state = end;
+      }
+    } else {
+      gameConfig.explorer.alpha = 1;
+    }
+  }); //Check for collision between explorer and treasure
+
+  gameConfig.treasures.forEach(function (treasure, index) {
+    if (Collision_1.default.hasCollision(gameConfig.explorer, treasure) && !gameConfig.explorer.hasTreasure) {
+      // treasure.x = gameConfig.explorer.x + 8;
+      // treasure.y = gameConfig.explorer.y + 8;
+      gameConfig.explorer.hasTreasure = true;
+      gameConfig.explorer.idTreasure = index;
+    } //Check for collision between treasure and door
+
+
+    if (Collision_1.default.hasCollision(treasure, gameConfig.door)) {
+      //gameConfig.message.text = "You won!";
+      gameConfig.explorer.hasTreasure = false;
+      gameConfig.explorer.idTreasure = undefined;
+      treasure.visible = false;
+    }
+  });
+  gameConfig.treasures = gameConfig.treasures.filter(function (treasure) {
+    return treasure.visible;
+  });
+
+  if (!gameConfig.treasures.length) {
+    levelUp();
+  }
+
+  [];
+
+  if (gameConfig.explorer.hasTreasure) {
+    gameConfig.treasures[gameConfig.explorer.idTreasure].x = gameConfig.explorer.x + 8;
+    gameConfig.treasures[gameConfig.explorer.idTreasure].y = gameConfig.explorer.y + 8;
+  }
+
+  gameConfig.explorer.tint = Math.random() * 0xffffff;
+}
+
+function end(delta) {
+  //TODO: All the code that should run after the end of the game
+  gameConfig.keys.forEach(function (key) {
+    key.unsubscribe();
+  });
+  gameConfig.gameOverScene.visible = false;
+  gameConfig.gameOverScene.visible = true;
+}
+
+function levelUp() {
+  //sanitize();
+  //clearContainer(app.stage);
+  //console.log("level up");
+  gameConfig.levelCounter += 1;
+  gameConfig.levelText.text = "Level: " + gameConfig.levelCounter;
+  gameConfig.availableTreasures += 1;
+  buildTreasure();
+  gameConfig.blobs.forEach(function (blob) {
+    blob.moves.up += 1;
+    blob.moves.down += 1;
+  });
+}
+
+function clearContainer(container) {
+  var sprites = container.children;
+  sprites.forEach(function (c) {
+    c.destroy();
+  });
+}
+
+function sanitize() {
+  gameConfig.treasures.length = 0;
+  gameConfig.blobs.length = 0;
+}
+},{"pixi.js":"../node_modules/pixi.js/lib/index.js","./Key":"Key.ts","./Collision":"Collision.ts","./Explorer":"Explorer.ts","./Blob":"Blob.ts","./RandomRange":"RandomRange.ts","./Contain":"Contain.ts"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42879,7 +42985,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34487" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37485" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -43055,5 +43161,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel/src/builtins/hmr-runtime.js","pixi-examples-sprite.ts"], null)
-//# sourceMappingURL=/pixi-examples-sprite.8a34c103.js.map
+},{}]},{},["../node_modules/parcel/src/builtins/hmr-runtime.js","treasureHunter.ts"], null)
+//# sourceMappingURL=/treasureHunter.d672737f.js.map
