@@ -1,8 +1,12 @@
-import { Sprite, Texture, interaction } from "pixi.js";
+import { Sprite, Texture, interaction, Point } from "pixi.js";
 
 export default abstract class AbstractExtendSprite extends Sprite {
   interactionEvent = {} as interaction.InteractionEvent | null;
   dragging = false;
+
+  original = {
+    scale: new Point(),
+  };
 
   direction = Math.random() * Math.PI * 2;
   turningSpeed = Math.random() - 0.8;
