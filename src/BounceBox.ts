@@ -1,11 +1,11 @@
-import { Rectangle, Sprite } from "pixi.js";
+import { Rectangle, Sprite, Graphics } from "pixi.js";
 
 export default class BounceBox {
   private bounce: Rectangle;
   constructor(public width: number, public height: number) {
     this.bounce = new Rectangle(0, 0, width, height);
   }
-  keepSpriteInBounce(sprite: Sprite) {
+  keepSpriteInBounce(sprite: Sprite | Graphics) {
     const spriteWidth = sprite.width;
     const spriteHeight = sprite.height;
     if (sprite.x < this.bounce.x - spriteWidth) {
