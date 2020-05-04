@@ -1,4 +1,4 @@
-import rr from "../RandomRange";
+import RandomRange from "../RandomRange";
 
 describe("RandomRange class", () => {
   it("should return value in range", () => {
@@ -6,7 +6,7 @@ describe("RandomRange class", () => {
     const start = -100;
     const end = 100;
     for (let i = 0; i < 10000; i++) {
-      const result = rr.getRandomInt(start, end);
+      const result = RandomRange.getRandomInt(start, end);
       expect(result).toBeGreaterThanOrEqual(start);
       expect(result).toBeLessThanOrEqual(end);
       results.push(result);

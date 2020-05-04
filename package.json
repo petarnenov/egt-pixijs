@@ -16,11 +16,13 @@
     "@types/node": "^13.13.2",
     "@types/pixi.js": "^4.8.8",
     "jest": "^25.4.0",
+    "jest-canvas-mock": "^2.2.0",
     "parcel": "^1.12.4",
     "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "pixi-filters": "^2.7.1",
     "pixi.js": "^4.8.8",
     "v8": "^0.1.0"
   }
