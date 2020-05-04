@@ -1,5 +1,4 @@
 import {
-  Application,
   Sprite,
   Texture,
   filters,
@@ -15,6 +14,7 @@ import ExampleSprite from "./ExampleSprite";
 import BounceBox from "./BounceBox";
 import { deflate } from "zlib";
 import ExtendedResource from "./ExtendResource";
+import { initApp, destroyApp } from "./initApp";
 
 const width = 800;
 const height = 600;
@@ -301,17 +301,3 @@ function filtersCustomFilter() {
 }
 
 filtersBlur();
-
-function initApp() {
-  const app = new Application({
-    antialias: true,
-    resolution: 1,
-  });
-  document.body.appendChild(app.view);
-  return app;
-}
-
-function destroyApp(app: Application) {
-  document.body.removeChild(app.view);
-  app.destroy();
-}

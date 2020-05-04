@@ -2,5 +2,6 @@
     "editor.fontSize": 18,
     "debug.console.fontSize": 18,
     "editor.formatOnSave": true,
-    "editor.formatOnType": true
+    "editor.formatOnType": true,
+    "editor.tabSize": 2
 }
